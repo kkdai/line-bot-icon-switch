@@ -1,11 +1,17 @@
-LINE Bot Icon/Nick Name Swtich demo code: A simple Golang LINE Bot Template for LINE Bot API
+LINE Bot Icon/Nick Name Swtich demo: Sample code how to use Icon/Nick name switch in LINE Bot in Go
+
 ==============
 
-[![Join the chat at https://gitter.im/kkdai/LineBotTemplate](https://badges.gitter.im/kkdai/LineBotTemplate.svg)](https://gitter.im/kkdai/LineBotTemplate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/kkdai/LineBotTemplate](https://badges.gitter.im/kkdai/LineBotTemplate.svg)](https://gitter.im/kkdai/LineBotTemplate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![GoDoc](https://godoc.org/github.com/kkdai/LineBotTemplate.svg?status.svg)](https://godoc.org/github.com/kkdai/LineBotTemplate)  [![Build Status](https://travis-ci.org/kkdai/LineBotTemplate.svg?branch=master)](https://travis-ci.org/kkdai/LineBotTemplate.svg) [![goreportcard.com](https://goreportcard.com/badge/github.com/kkdai/LineBotTemplate)](https://goreportcard.com/report/github.com/kkdai/LineBotTemplate)
 
- [![GoDoc](https://godoc.org/github.com/kkdai/LineBotTemplate.svg?status.svg)](https://godoc.org/github.com/kkdai/LineBotTemplate)  [![Build Status](https://travis-ci.org/kkdai/LineBotTemplate.svg?branch=master)](https://travis-ci.org/kkdai/LineBotTemplate.svg)
+Icon / Nick name Switch in LINE Bot
+=============
 
-[![goreportcard.com](https://goreportcard.com/badge/github.com/kkdai/LineBotTemplate)](https://goreportcard.com/report/github.com/kkdai/LineBotTemplate)
+![](https://developers.line.biz/assets/img/icon-nickname-switch.7ad52e1a.jpg)
+
+Icon/Nick name switch is new feature of LINE Bot open for public in 2020/03/17. (Please refer this [news](https://developers.line.biz/zh-hant/news/2020/03/17/icon-nickname-switch/) )
+
+
 
 
 Installation and Usage
@@ -54,18 +60,6 @@ It all done.
 ### Chinese Tutorial:
 
 如果你看得懂繁體中文，這裡有[中文的介紹](http://www.evanlin.com/create-your-line-bot-golang/) 
-
-Inspired By
-=============
-
-- [Golang (heroku) で LINE Bot 作ってみる](http://qiita.com/dongri/items/ba150f04a98e96b160e7)
-- [LINE BOT をとりあえずタダで Heroku で動かす](http://qiita.com/yuya_takeyama/items/0660a59d13e2cd0b2516)
-- [阿美語萌典 BOT](https://github.com/miaoski/amis-linebot)
-
-Project52
----------------
-
-It is one of my [project 52](https://github.com/kkdai/project52).
 
 
 License
