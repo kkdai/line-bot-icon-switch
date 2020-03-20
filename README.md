@@ -45,7 +45,7 @@ Installation and Usage
 
 2.2 Setup your basic account information. Here is some info you will need to know.
 
-- `Callback URL`: https://{YOUR_HEROKU_SERVER_ID}.herokuapp.com:443/callback
+- `Callback URL`: https://{YOUR_HEROKU_SERVER_ID}.herokuapp.com/callback
 - Verify your webhook.
 
 2.3 You will get following info, need fill back to Heroku.
