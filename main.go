@@ -75,7 +75,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				if sendr != nil {
 					//Send message with switched sender.
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Hi, this is "+message.Text+" Nice, to meet you.").WithSender(sendr)).Do(); err != nil {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Hi, this is "+message.Text+", Nice to meet you.").WithSender(sendr)).Do(); err != nil {
 						log.Print(err)
 					}
 				}
