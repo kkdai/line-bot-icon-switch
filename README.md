@@ -36,50 +36,32 @@ Installation and Usage
 
 [Make sure you already registered](https://business.line.me/zh-hant/services/bot), if you need use LINE Bot.
 
-### 2. Just Deploy the same on Heroku
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-Remember your heroku, ID.
 
 <br><br>
 
-### 3. Go to LINE Developer Console, setup basic API
+### 2. Go to LINE Developer Console
 
-3.1 Close auto-reply setting on "Messaging API" Tab.
+2.1 Close auto-reply setting on "Messaging API" Tab.
 
-3.2 Setup your basic account information. Here is some info you will need to know.
+2.2 Setup your basic account information. Here is some info you will need to know.
 
 - `Callback URL`: https://{YOUR_HEROKU_SERVER_ID}.herokuapp.com:443/callback
 - Verify your webhook.
 
-3.3 You will get following info, need fill back to Heroku.
+2.3 You will get following info, need fill back to Heroku.
 
 - Channel Secret
 - Channel Access Token (You need to issue one here)
 
+### 3. Just Deploy the same on Heroku
 
-### 4. Back to Heroku again to setup environment variables
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-- Go to dashboard
-- Go to "Setting"
-- Go to "Config Variables", add following variables:
-	- "ChannelSecret"
-	- "ChannelAccessToken"
+- Input `CHANNEL_SECRET` and `CHANNEL_TOKEN` from LINE Developer Console.
+
+Remember your heroku, ID.
 
 It all done.
-
-
-### Video Tutorial:
-
-- [How to deploy LINE BotTemplate](https://www.youtube.com/watch?v=xpP51Kwuy2U)
-- [Hoe to modify your LINE BotTemplate code](https://www.youtube.com/watch?v=ckij73sIRik)
-
-
-### Chinese Tutorial:
-
-如果你看得懂繁體中文，這裡有[中文的介紹](http://www.evanlin.com/create-your-line-bot-golang/) 
-
 
 License
 ---------------
