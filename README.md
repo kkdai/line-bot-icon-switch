@@ -6,14 +6,27 @@ LINE Bot Icon/Nick Name Swtich demo: Sample code how to use Icon/Nick name switc
 Icon / Nick name Switch in LINE Bot
 =============
 
-![](https://developers.line.biz/assets/img/icon-nickname-switch.7ad52e1a.jpg)
+![](images/icon.jpg)
 
-Icon/Nick name switch is new feature of LINE Bot open for public in 2020/03/17. (Please refer this [news](https://developers.line.biz/zh-hant/news/2020/03/17/icon-nickname-switch/) )
+Icon.Nick name switch is new feature of LINE Bot open for public in 2020/03/17. (Please refer this [news](https://developers.line.biz/zh-hant/news/2020/03/17/icon-nickname-switch/) )
+
+
+### Reference:
+
+- [LINE Official Open Stickers](https://developers.line.biz/media/messaging-api/sticker_list.pdf)
 
 How to Use it
 =============
 
+![](images/icon-bot.png)
 
+- Add this OA.
+- Input any text.
+- LINE Bot will notify you input "Brown", "Cony" or "Sally".
+- Input anyone to reply you.
+
+
+![](images/screen.jpg)
 
 
 Installation and Usage

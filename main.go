@@ -22,6 +22,7 @@ import (
 	"github.com/kkdai/line-bot-sdk-go/linebot"
 )
 
+//For LINE Friends images, please refer to https://developers.line.biz/media/messaging-api/sticker_list.pdf
 const (
 	BrownImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002734/iPhone/sticker_key@2x.png"
 	ConyImage  string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002735/iPhone/sticker_key@2x.png"
@@ -74,7 +75,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				if sendr != nil {
 					//Send message with switched sender.
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Hi, this is"+message.Text+" Nice, to meet you.").WithSender(sendr)).Do(); err != nil {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Hi, this is "+message.Text+" Nice, to meet you.").WithSender(sendr)).Do(); err != nil {
 						log.Print(err)
 					}
 				}
