@@ -1,0 +1,14 @@
+{
+  "name": "LINEBotIconSwitch",
+  "description": "LINE Bot Icon switch demo",
+  "repository": "https://github.com/kkdai/line-bot-icon-switch",
+  "keywords": ["Line", "go", "static"],
+  "buildpacks": [
+    {
+      "url": "https://github.com/kr/heroku-buildpack-go.git"
+    },
+    {
+      "url": "heroku/go"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# github.com/kkdai/line-bot-sdk-go v7.2.1+incompatible
+## explicit
+github.com/kkdai/line-bot-sdk-go/linebot
+# github.com/line/line-bot-sdk-go v7.2.0+incompatible
+## explicit
