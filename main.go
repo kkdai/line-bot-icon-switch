@@ -17,9 +17,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+	"strings"
 
 	"github.com/kkdai/line-bot-sdk-go/linebot"
+)
+
+const (
+	BrownImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002734/iPhone/sticker_key@2x.png"
+	ConyImage  string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002735/iPhone/sticker_key@2x.png"
+	SallyImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002736/iPhone/sticker_key@2x.png"
 )
 
 var bot *linebot.Client
@@ -50,12 +56,27 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				quota, err := bot.GetMessageQuota().Do()
-				if err != nil {
-					log.Println("Quota err:", err)
+				var sendr *linebot.Sender
+
+				//If user already select the sender feedback, prepare user nick name and icon here.
+				switch {
+				case strings.EqualFold(message.Text, "Brown"):
+					sendr = linebot.NewSender("Brown", BrownImage)
+				case strings.EqualFold(message.Text, "Cony"):
+					sendr = linebot.NewSender("Cony", ConyImage)
+				case strings.EqualFold(message.Text, "Sally"):
+					sendr = linebot.NewSender("Sally", SallyImage)
+				default:
+					//User input other than our provide range, notify user by quick reply.
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Please select following LINE Friends to reply you: Brown, Cony and Sally.")).Do(); err != nil {
+						log.Print(err)
+					}
 				}
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.ID+":"+message.Text+" OK! remain message:"+strconv.FormatInt(quota.Value, 10)), linebot.NewTextMessage("line://app/1653344519-j4GdLXQ6")).Do(); err != nil {
-					log.Print(err)
+				if sendr != nil {
+					//Send message with switched sender.
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Hi, this is"+message.Text+" Nice, to meet you.").WithSender(sendr)).Do(); err != nil {
+						log.Print(err)
+					}
 				}
 			}
 		}
