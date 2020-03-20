@@ -31,16 +31,20 @@ Remember your heroku, ID.
 
 <br><br>
 
-### 3. Go to LINE Bot Dashboard, setup basic API
+### 3. Go to LINE Developer Console, setup basic API
 
-Setup your basic account information. Here is some info you will need to know.
+3.1 Close auto-reply setting on "Messaging API" Tab.
+
+3.2 Setup your basic account information. Here is some info you will need to know.
 
 - `Callback URL`: https://{YOUR_HEROKU_SERVER_ID}.herokuapp.com:443/callback
+- Verify your webhook.
 
-You will get following info, need fill back to Heroku.
+3.3 You will get following info, need fill back to Heroku.
 
 - Channel Secret
-- Channel Access Token
+- Channel Access Token (You need to issue one here)
+
 
 ### 4. Back to Heroku again to setup environment variables
 
@@ -50,7 +54,7 @@ You will get following info, need fill back to Heroku.
 	- "ChannelSecret"
 	- "ChannelAccessToken"
 
-It all done.	
+It all done.
 
 
 ### Video Tutorial:
