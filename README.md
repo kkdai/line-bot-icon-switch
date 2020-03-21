@@ -1,7 +1,7 @@
 LINE Bot Icon/Nick Name Swtich demo: Sample code how to use Icon/Nick name switch in LINE Bot in Go
 ==============
 
-[![Join the chat at https://gitter.im/kkdai/line-bot-icon-switch](https://badges.gitter.im/kkdai/line-bot-icon-switch.svg)](https://gitter.im/kkdai/line-bot-icon-switch?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![GoDoc](https://godoc.org/github.com/kkdai/line-bot-icon-switch.svg?status.svg)](https://godoc.org/github.com/kkdai/line-bot-icon-switch)  [![Build Status](https://travis-ci.org/kkdai/line-bot-icon-switch.svg?branch=master)](https://travis-ci.org/kkdai/line-bot-icon-switch.svg) [![goreportcard.com](https://goreportcard.com/badge/github.com/kkdai/line-bot-icon-switch)](https://goreportcard.com/report/github.com/kkdai/line-bot-icon-switch)
+[![GoDoc](https://godoc.org/github.com/kkdai/line-bot-icon-switch.svg?status.svg)](https://godoc.org/github.com/kkdai/line-bot-icon-switch)  [![Build Status](https://travis-ci.org/kkdai/line-bot-icon-switch.svg?branch=master)](https://travis-ci.org/kkdai/line-bot-icon-switch.svg) [![goreportcard.com](https://goreportcard.com/badge/github.com/kkdai/line-bot-icon-switch)](https://goreportcard.com/report/github.com/kkdai/line-bot-icon-switch)
 
 Icon / Nick name Switch in LINE Bot
 =============
