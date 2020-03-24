@@ -19,7 +19,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kkdai/line-bot-sdk-go/linebot"
+	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 //For LINE Friends images, please refer to https://developers.line.biz/media/messaging-api/sticker_list.pdf
