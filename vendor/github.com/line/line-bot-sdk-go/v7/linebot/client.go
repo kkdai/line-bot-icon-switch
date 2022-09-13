@@ -15,13 +15,18 @@
 package linebot
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"path"
+	"time"
 )
 
 // APIEndpoint constants
@@ -41,10 +46,14 @@ const (
 	APIEndpointLeaveGroup                 = "/v2/bot/group/%s/leave"
 	APIEndpointLeaveRoom                  = "/v2/bot/room/%s/leave"
 	APIEndpointGetProfile                 = "/v2/bot/profile/%s"
+	APIEndpointGetFollowerIDs             = "/v2/bot/followers/ids"
 	APIEndpointGetGroupMemberProfile      = "/v2/bot/group/%s/member/%s"
 	APIEndpointGetRoomMemberProfile       = "/v2/bot/room/%s/member/%s"
 	APIEndpointGetGroupMemberIDs          = "/v2/bot/group/%s/members/ids"
 	APIEndpointGetRoomMemberIDs           = "/v2/bot/room/%s/members/ids"
+	APIEndpointGetGroupMemberCount        = "/v2/bot/group/%s/members/count"
+	APIEndpointGetRoomMemberCount         = "/v2/bot/room/%s/members/count"
+	APIEndpointGetGroupSummary            = "/v2/bot/group/%s/summary"
 	APIEndpointCreateRichMenu             = "/v2/bot/richmenu"
 	APIEndpointGetRichMenu                = "/v2/bot/richmenu/%s"
 	APIEndpointListRichMenu               = "/v2/bot/richmenu/list"
@@ -58,6 +67,13 @@ const (
 	APIEndpointUploadRichMenuImage        = "/v2/bot/richmenu/%s/content" // Download: GET / Upload: POST
 	APIEndpointBulkLinkRichMenu           = "/v2/bot/richmenu/bulk/link"
 	APIEndpointBulkUnlinkRichMenu         = "/v2/bot/richmenu/bulk/unlink"
+	APIEndpointValidateRichMenuObject     = "/v2/bot/richmenu/validate"
+
+	APIEndpointCreateRichMenuAlias = "/v2/bot/richmenu/alias"
+	APIEndpointGetRichMenuAlias    = "/v2/bot/richmenu/alias/%s"
+	APIEndpointUpdateRichMenuAlias = "/v2/bot/richmenu/alias/%s"
+	APIEndpointDeleteRichMenuAlias = "/v2/bot/richmenu/alias/%s"
+	APIEndpointListRichMenuAlias   = "/v2/bot/richmenu/alias/list"
 
 	APIEndpointGetAllLIFFApps = "/liff/v1/apps"
 	APIEndpointAddLIFFApp     = "/liff/v1/apps"
@@ -69,9 +85,28 @@ const (
 	APIEndpointGetMessageDelivery = "/v2/bot/message/delivery/%s"
 	APIEndpointGetMessageProgress = "/v2/bot/message/progress/%s"
 	APIEndpointInsight            = "/v2/bot/insight/%s"
+	APIEndpointGetBotInfo         = "/v2/bot/info"
 
 	APIEndpointIssueAccessToken  = "/v2/oauth/accessToken"
 	APIEndpointRevokeAccessToken = "/v2/oauth/revoke"
+
+	APIEndpointIssueAccessTokenV2  = "/oauth2/v2.1/token"
+	APIEndpointGetAccessTokensV2   = "/oauth2/v2.1/tokens/kid"
+	APIEndpointRevokeAccessTokenV2 = "/oauth2/v2.1/revoke"
+
+	APIEndpointGetWebhookInfo     = "/v2/bot/channel/webhook/endpoint"
+	APIEndpointSetWebhookEndpoint = "/v2/bot/channel/webhook/endpoint"
+	APIEndpointTestWebhook        = "/v2/bot/channel/webhook/test"
+
+	APIAudienceGroupUpload            = "/v2/bot/audienceGroup/upload"
+	APIAudienceGroupUploadByFile      = "/v2/bot/audienceGroup/upload/byFile"
+	APIAudienceGroupClick             = "/v2/bot/audienceGroup/click"
+	APIAudienceGroupIMP               = "/v2/bot/audienceGroup/imp"
+	APIAudienceGroupUpdateDescription = "/v2/bot/audienceGroup/%d/updateDescription"
+	APIAudienceGroupActivate          = "/v2/bot/audienceGroup/%d/activate"
+	APIAudienceGroup                  = "/v2/bot/audienceGroup/%d"
+	APIAudienceGroupList              = "/v2/bot/audienceGroup/list"
+	APIAudienceGroupAuthorityLevel    = "/v2/bot/audienceGroup/authorityLevel"
 )
 
 // Client type
@@ -81,6 +116,7 @@ type Client struct {
 	endpointBase     *url.URL     // default APIEndpointBase
 	endpointBaseData *url.URL     // default APIEndpointBaseData
 	httpClient       *http.Client // default http.DefaultClient
+	retryKeyID       string       // X-Line-Retry-Key allows you to safely retry API requests without duplicating messages
 }
 
 // ClientOption type
@@ -163,11 +199,13 @@ func (client *Client) url(base *url.URL, endpoint string) string {
 func (client *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+client.channelToken)
 	req.Header.Set("User-Agent", "LINE-BotSDK-Go/"+version)
+	if len(client.retryKeyID) > 0 {
+		req.Header.Set("X-Line-Retry-Key", client.retryKeyID)
+	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 	return client.httpClient.Do(req)
-
 }
 
 func (client *Client) get(ctx context.Context, base *url.URL, endpoint string, query url.Values) (*http.Response, error) {
@@ -190,12 +228,25 @@ func (client *Client) post(ctx context.Context, endpoint string, body io.Reader)
 	return client.do(ctx, req)
 }
 
-func (client *Client) postform(ctx context.Context, endpoint string, body io.Reader) (*http.Response, error) {
+func (client *Client) postForm(ctx context.Context, endpoint string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest("POST", client.url(client.endpointBase, endpoint), body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return client.do(ctx, req)
+}
+
+func (client *Client) postFormFile(ctx context.Context, endpoint string, values map[string]io.Reader) (*http.Response, error) {
+	b, contentType, err := uploadFile(values)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPost, client.url(client.endpointBaseData, endpoint), &b)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
 	return client.do(ctx, req)
 }
 
@@ -208,6 +259,19 @@ func (client *Client) put(ctx context.Context, endpoint string, body io.Reader) 
 	return client.do(ctx, req)
 }
 
+func (client *Client) putFormFile(ctx context.Context, endpoint string, values map[string]io.Reader) (*http.Response, error) {
+	b, contentType, err := uploadFile(values)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest(http.MethodPut, client.url(client.endpointBaseData, endpoint), &b)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
+	return client.do(ctx, req)
+}
+
 func (client *Client) delete(ctx context.Context, endpoint string) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodDelete, client.url(client.endpointBase, endpoint), nil)
 	if err != nil {
@@ -216,8 +280,43 @@ func (client *Client) delete(ctx context.Context, endpoint string) (*http.Respon
 	return client.do(ctx, req)
 }
 
+func (client *Client) setRetryKey(retryKey string) {
+	client.retryKeyID = retryKey
+}
+
 func closeResponse(res *http.Response) error {
 	defer res.Body.Close()
 	_, err := io.Copy(ioutil.Discard, res.Body)
 	return err
+}
+
+func uploadFile(values map[string]io.Reader) (bytes.Buffer, string, error) {
+	var (
+		b   bytes.Buffer
+		err error
+	)
+	w := multipart.NewWriter(&b)
+	for key, r := range values {
+		var fw io.Writer
+		if x, ok := r.(io.Closer); ok {
+			defer x.Close()
+		}
+		if _, ok := r.(*bytes.Buffer); ok {
+			h := make(textproto.MIMEHeader)
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s.txt"`, key, time.Now().Format("20060102150405")))
+			h.Set("Content-Type", "text/plain")
+			if fw, err = w.CreatePart(h); err != nil {
+				return b, "", err
+			}
+		} else {
+			if fw, err = w.CreateFormField(key); err != nil {
+				return b, "", err
+			}
+		}
+		if _, err := io.Copy(fw, r); err != nil {
+			return b, "", err
+		}
+	}
+	w.Close()
+	return b, w.FormDataContentType(), nil
 }

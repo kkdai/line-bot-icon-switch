@@ -19,10 +19,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-//For LINE Friends images, please refer to https://developers.line.biz/media/messaging-api/sticker_list.pdf
+// For LINE Friends images, please refer to https://developers.line.biz/media/messaging-api/sticker_list.pdf
 const (
 	BrownImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002734/iPhone/sticker_key@2x.png"
 	ConyImage  string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002735/iPhone/sticker_key@2x.png"

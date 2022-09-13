@@ -33,6 +33,7 @@ const (
 	RichMenuActionTypeMessage        RichMenuActionType = "message"
 	RichMenuActionTypePostback       RichMenuActionType = "postback"
 	RichMenuActionTypeDatetimePicker RichMenuActionType = "datetimepicker"
+	RichMenuActionTypeRichMenuSwitch RichMenuActionType = "richmenuswitch"
 )
 
 // RichMenuSize type
@@ -51,14 +52,17 @@ type RichMenuBounds struct {
 
 // RichMenuAction with type
 type RichMenuAction struct {
-	Type    RichMenuActionType `json:"type"`
-	URI     string             `json:"uri,omitempty"`
-	Text    string             `json:"text,omitempty"`
-	Data    string             `json:"data,omitempty"`
-	Mode    string             `json:"mode,omitempty"`
-	Initial string             `json:"initial,omitempty"`
-	Max     string             `json:"max,omitempty"`
-	Min     string             `json:"min,omitempty"`
+	Type            RichMenuActionType `json:"type"`
+	URI             string             `json:"uri,omitempty"`
+	Text            string             `json:"text,omitempty"`
+	DisplayText     string             `json:"displayText,omitempty"`
+	Label           string             `json:"label,omitempty"`
+	Data            string             `json:"data,omitempty"`
+	Mode            string             `json:"mode,omitempty"`
+	Initial         string             `json:"initial,omitempty"`
+	Max             string             `json:"max,omitempty"`
+	Min             string             `json:"min,omitempty"`
+	RichMenuAliasID string             `json:"richMenuAliasId,omitempty"`
 }
 
 // AreaDetail type for areas array
@@ -95,8 +99,10 @@ type RichMenu struct {
             "height": 1686
           },
           "action": {
-            "type": "postback"
-            "data": "action=buy&itemid=123"
+            "type": "postback",
+            "data": "action=buy&itemid=123",
+            "label":"Buy",
+            "displayText":"Buy"
           }
         }
       ]
@@ -113,7 +119,7 @@ func (client *Client) GetRichMenu(richMenuID string) *GetRichMenuCall {
 	}
 }
 
-//GetRichMenuCall type
+// GetRichMenuCall type
 type GetRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -146,7 +152,7 @@ func (client *Client) GetUserRichMenu(userID string) *GetUserRichMenuCall {
 	}
 }
 
-//GetUserRichMenuCall type
+// GetUserRichMenuCall type
 type GetUserRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -232,7 +238,7 @@ func (client *Client) DeleteRichMenu(richMenuID string) *DeleteRichMenuCall {
 	}
 }
 
-//DeleteRichMenuCall type
+// DeleteRichMenuCall type
 type DeleteRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -266,7 +272,7 @@ func (client *Client) LinkUserRichMenu(userID, richMenuID string) *LinkUserRichM
 	}
 }
 
-//LinkUserRichMenuCall type
+// LinkUserRichMenuCall type
 type LinkUserRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -300,7 +306,7 @@ func (client *Client) UnlinkUserRichMenu(userID string) *UnlinkUserRichMenuCall 
 	}
 }
 
-//UnlinkUserRichMenuCall type
+// UnlinkUserRichMenuCall type
 type UnlinkUserRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -333,7 +339,7 @@ func (client *Client) SetDefaultRichMenu(richMenuID string) *SetDefaultRichMenuC
 	}
 }
 
-//SetDefaultRichMenuCall type
+// SetDefaultRichMenuCall type
 type SetDefaultRichMenuCall struct {
 	c   *Client
 	ctx context.Context
@@ -423,7 +429,7 @@ func (client *Client) GetRichMenuList() *GetRichMenuListCall {
 	}
 }
 
-//GetRichMenuListCall type
+// GetRichMenuListCall type
 type GetRichMenuListCall struct {
 	c   *Client
 	ctx context.Context
@@ -621,6 +627,251 @@ func (call *BulkUnlinkRichMenuCall) Do() (*BasicResponse, error) {
 		return nil, err
 	}
 	res, err := call.c.post(call.ctx, APIEndpointBulkUnlinkRichMenu, &buf)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToBasicResponse(res)
+}
+
+// CreateRichMenuAlias method
+func (client *Client) CreateRichMenuAlias(richMenuAliasID, richMenuID string) *CreateRichMenuAliasCall {
+	return &CreateRichMenuAliasCall{
+		c:               client,
+		richMenuAliasID: richMenuAliasID,
+		richMenuID:      richMenuID,
+	}
+}
+
+// CreateRichMenuAliasCall type
+type CreateRichMenuAliasCall struct {
+	c   *Client
+	ctx context.Context
+
+	richMenuAliasID string
+	richMenuID      string
+}
+
+// WithContext method
+func (call *CreateRichMenuAliasCall) WithContext(ctx context.Context) *CreateRichMenuAliasCall {
+	call.ctx = ctx
+	return call
+}
+
+func (call *CreateRichMenuAliasCall) encodeJSON(w io.Writer) error {
+	enc := json.NewEncoder(w)
+	return enc.Encode(&struct {
+		RichMenuAliasID string `json:"richMenuAliasId"`
+		RichMenuID      string `json:"richMenuId"`
+	}{
+		RichMenuAliasID: call.richMenuAliasID,
+		RichMenuID:      call.richMenuID,
+	})
+}
+
+// Do method
+func (call *CreateRichMenuAliasCall) Do() (*BasicResponse, error) {
+	var buf bytes.Buffer
+	if err := call.encodeJSON(&buf); err != nil {
+		return nil, err
+	}
+	res, err := call.c.post(call.ctx, APIEndpointCreateRichMenuAlias, &buf)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToBasicResponse(res)
+}
+
+// UpdateRichMenuAlias method
+func (client *Client) UpdateRichMenuAlias(richMenuAliasID, richMenuID string) *UpdateRichMenuAliasCall {
+	return &UpdateRichMenuAliasCall{
+		c:               client,
+		richMenuAliasID: richMenuAliasID,
+		richMenuID:      richMenuID,
+	}
+}
+
+// UpdateRichMenuAliasCall type
+type UpdateRichMenuAliasCall struct {
+	c   *Client
+	ctx context.Context
+
+	richMenuAliasID string
+	richMenuID      string
+}
+
+// WithContext method
+func (call *UpdateRichMenuAliasCall) WithContext(ctx context.Context) *UpdateRichMenuAliasCall {
+	call.ctx = ctx
+	return call
+}
+
+func (call *UpdateRichMenuAliasCall) encodeJSON(w io.Writer) error {
+	enc := json.NewEncoder(w)
+	return enc.Encode(&struct {
+		RichMenuID string `json:"richMenuId"`
+	}{
+		RichMenuID: call.richMenuID,
+	})
+}
+
+// Do method
+func (call *UpdateRichMenuAliasCall) Do() (*BasicResponse, error) {
+	var buf bytes.Buffer
+	if err := call.encodeJSON(&buf); err != nil {
+		return nil, err
+	}
+	endpoint := fmt.Sprintf(APIEndpointUpdateRichMenuAlias, call.richMenuAliasID)
+	res, err := call.c.post(call.ctx, endpoint, &buf)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToBasicResponse(res)
+}
+
+// DeleteRichMenuAlias method
+func (client *Client) DeleteRichMenuAlias(richMenuAliasID string) *DeleteRichMenuAliasCall {
+	return &DeleteRichMenuAliasCall{
+		c:               client,
+		richMenuAliasID: richMenuAliasID,
+	}
+}
+
+// DeleteRichMenuAliasCall type
+type DeleteRichMenuAliasCall struct {
+	c   *Client
+	ctx context.Context
+
+	richMenuAliasID string
+}
+
+// WithContext method
+func (call *DeleteRichMenuAliasCall) WithContext(ctx context.Context) *DeleteRichMenuAliasCall {
+	call.ctx = ctx
+	return call
+}
+
+// Do method
+func (call *DeleteRichMenuAliasCall) Do() (*BasicResponse, error) {
+	endpoint := fmt.Sprintf(APIEndpointDeleteRichMenuAlias, call.richMenuAliasID)
+	res, err := call.c.delete(call.ctx, endpoint)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToBasicResponse(res)
+}
+
+// GetRichMenuAlias method
+func (client *Client) GetRichMenuAlias(richMenuAliasID string) *GetRichMenuAliasCall {
+	return &GetRichMenuAliasCall{
+		c:               client,
+		richMenuAliasID: richMenuAliasID,
+	}
+}
+
+// GetRichMenuAliasCall type
+type GetRichMenuAliasCall struct {
+	c   *Client
+	ctx context.Context
+
+	richMenuAliasID string
+}
+
+// WithContext method
+func (call *GetRichMenuAliasCall) WithContext(ctx context.Context) *GetRichMenuAliasCall {
+	call.ctx = ctx
+	return call
+}
+
+// Do method
+func (call *GetRichMenuAliasCall) Do() (*RichMenuAliasResponse, error) {
+	endpoint := fmt.Sprintf(APIEndpointGetRichMenuAlias, call.richMenuAliasID)
+	res, err := call.c.get(call.ctx, call.c.endpointBase, endpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToRichMenuAliasResponse(res)
+}
+
+// GetRichMenuAliasList method
+func (client *Client) GetRichMenuAliasList() *GetRichMenuAliasListCall {
+	return &GetRichMenuAliasListCall{
+		c: client,
+	}
+}
+
+// GetRichMenuAliasListCall type
+type GetRichMenuAliasListCall struct {
+	c   *Client
+	ctx context.Context
+}
+
+// WithContext method
+func (call *GetRichMenuAliasListCall) WithContext(ctx context.Context) *GetRichMenuAliasListCall {
+	call.ctx = ctx
+	return call
+}
+
+// Do method
+func (call *GetRichMenuAliasListCall) Do() ([]*RichMenuAliasResponse, error) {
+	res, err := call.c.get(call.ctx, call.c.endpointBase, APIEndpointListRichMenuAlias, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer closeResponse(res)
+	return decodeToRichMenuAliasListResponse(res)
+}
+
+// ValidateRichMenuObject method
+func (client *Client) ValidateRichMenuObject(richMenu RichMenu) *ValidateRichMenuObjectCall {
+	return &ValidateRichMenuObjectCall{
+		c:        client,
+		richMenu: richMenu,
+	}
+}
+
+// ValidateRichMenuObjectCall type
+type ValidateRichMenuObjectCall struct {
+	c   *Client
+	ctx context.Context
+
+	richMenu RichMenu
+}
+
+// WithContext method
+func (call *ValidateRichMenuObjectCall) WithContext(ctx context.Context) *ValidateRichMenuObjectCall {
+	call.ctx = ctx
+	return call
+}
+
+func (call *ValidateRichMenuObjectCall) encodeJSON(w io.Writer) error {
+	enc := json.NewEncoder(w)
+	return enc.Encode(&struct {
+		Size        RichMenuSize `json:"size"`
+		Selected    bool         `json:"selected"`
+		Name        string       `json:"name"`
+		ChatBarText string       `json:"chatBarText"`
+		Areas       []AreaDetail `json:"areas"`
+	}{
+		Size:        call.richMenu.Size,
+		Selected:    call.richMenu.Selected,
+		Name:        call.richMenu.Name,
+		ChatBarText: call.richMenu.ChatBarText,
+		Areas:       call.richMenu.Areas,
+	})
+}
+
+// Do method
+func (call *ValidateRichMenuObjectCall) Do() (*BasicResponse, error) {
+	var buf bytes.Buffer
+	if err := call.encodeJSON(&buf); err != nil {
+		return nil, err
+	}
+	res, err := call.c.post(call.ctx, APIEndpointValidateRichMenuObject, &buf)
 	if err != nil {
 		return nil, err
 	}

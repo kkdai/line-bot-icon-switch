@@ -20,6 +20,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // BasicResponse type
@@ -36,6 +37,9 @@ type errorResponseDetail struct {
 type ErrorResponse struct {
 	Message string                `json:"message"`
 	Details []errorResponseDetail `json:"details"`
+	// OAuth Errors
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
 }
 
 // UserProfileResponse type
@@ -44,12 +48,31 @@ type UserProfileResponse struct {
 	DisplayName   string `json:"displayName"`
 	PictureURL    string `json:"pictureUrl"`
 	StatusMessage string `json:"statusMessage"`
+	Language      string `json:"language"`
+}
+
+// UserIDsResponse type
+type UserIDsResponse struct {
+	UserIDs []string `json:"userIds"`
+	Next    string   `json:"next"`
+}
+
+// GroupSummaryResponse type
+type GroupSummaryResponse struct {
+	GroupID    string `json:"groupId"`
+	GroupName  string `json:"groupName"`
+	PictureURL string `json:"pictureUrl"`
 }
 
 // MemberIDsResponse type
 type MemberIDsResponse struct {
 	MemberIDs []string `json:"memberIds"`
 	Next      string   `json:"next"`
+}
+
+// MemberCountResponse type
+type MemberCountResponse struct {
+	Count int `json:"count"`
 }
 
 // MessageContentResponse type
@@ -75,6 +98,17 @@ type MessageQuotaResponse struct {
 // MessageConsumptionResponse type
 type MessageConsumptionResponse struct {
 	TotalUsage int64
+}
+
+// BotInfoResponse type
+type BotInfoResponse struct {
+	UserID         string         `json:"userId"`
+	BasicID        string         `json:"basicId"`
+	PremiumID      string         `json:"premiumId"`
+	DisplayName    string         `json:"displayName"`
+	PictureURL     string         `json:"pictureUrl"`
+	ChatMode       ChatMode       `json:"chatMode"`
+	MarkAsReadMode MarkAsReadMode `json:"markAsReadMode"`
 }
 
 // MessagesNumberDeliveryResponse type
@@ -108,6 +142,8 @@ type MessagesProgressResponse struct {
 	TargetCount       int64  `json:"targetCount"`
 	FailedDescription string `json:"failedDescription"`
 	ErrorCode         int    `json:"errorCode"`
+	AcceptedTime      string `json:"acceptedTime"`
+	CompletedTime     string `json:"completedTime,omitempty"`
 }
 
 // MessagesFriendDemographicsResponse type
@@ -208,6 +244,12 @@ type RichMenuResponse struct {
 	Areas       []AreaDetail `json:"areas"`
 }
 
+// RichMenuAliasResponse type
+type RichMenuAliasResponse struct {
+	RichMenuAliasID string `json:"richMenuAliasId"`
+	RichMenuID      string `json:"richMenuId"`
+}
+
 // LIFFAppsResponse type
 type LIFFAppsResponse struct {
 	Apps []LIFFApp `json:"apps"`
@@ -223,6 +265,122 @@ type LinkTokenResponse struct {
 	LinkToken string `json:"linkToken"`
 }
 
+// WebhookInfoResponse type
+type WebhookInfoResponse struct {
+	Endpoint string `json:"endpoint"`
+	Active   bool   `json:"active"`
+}
+
+// UploadAudienceGroupResponse type
+type UploadAudienceGroupResponse struct {
+	RequestID         string `json:"-"`
+	AcceptedRequestID string `json:"-"`
+	AudienceGroupID   int    `json:"audienceGroupId,omitempty"`
+	CreateRoute       string `json:"createRoute,omitempty"`
+	Type              string `json:"type,omitempty"`
+	Description       string `json:"description,omitempty"`
+	Created           int64  `json:"created,omitempty"`
+	Permission        string `json:"permission,omitempty"`
+	ExpireTimestamp   int64  `json:"expireTimestamp,omitempty"`
+	IsIfaAudience     bool   `json:"isIfaAudience,omitempty"`
+}
+
+// ClickAudienceGroupResponse type
+type ClickAudienceGroupResponse struct {
+	XRequestID        string `json:"-"` // from header X-Line-Request-Id
+	AcceptedRequestID string `json:"-"`
+	AudienceGroupID   int    `json:"audienceGroupId,omitempty"`
+	CreateRoute       string `json:"createRoute,omitempty"`
+	Type              string `json:"type,omitempty"`
+	Description       string `json:"description,omitempty"`
+	Created           int64  `json:"created,omitempty"`
+	Permission        string `json:"permission,omitempty"`
+	ExpireTimestamp   int64  `json:"expireTimestamp,omitempty"`
+	IsIfaAudience     bool   `json:"isIfaAudience,omitempty"`
+	RequestID         string `json:"requestId,omitempty"`
+	ClickURL          string `json:"clickUrl,omitempty"`
+}
+
+// IMPAudienceGroupResponse type
+type IMPAudienceGroupResponse struct {
+	XRequestID        string `json:"-"`
+	AcceptedRequestID string `json:"-"`
+	AudienceGroupID   int    `json:"audienceGroupId,omitempty"`
+	CreateRoute       string `json:"createRoute,omitempty"`
+	Type              string `json:"type,omitempty"`
+	Description       string `json:"description,omitempty"`
+	Created           int64  `json:"created,omitempty"`
+	Permission        string `json:"permission,omitempty"`
+	ExpireTimestamp   int64  `json:"expireTimestamp,omitempty"`
+	IsIfaAudience     bool   `json:"isIfaAudience,omitempty"`
+	RequestID         string `json:"requestId,omitempty"`
+}
+
+// AudienceGroup type
+type AudienceGroup struct {
+	AudienceGroupID      int    `json:"audienceGroupId,omitempty"`
+	CreateRoute          string `json:"createRoute,omitempty"`
+	Type                 string `json:"type,omitempty"`
+	Description          string `json:"description,omitempty"`
+	Status               string `json:"status,omitempty"`
+	AudienceCount        int    `json:"audienceCount,omitempty"`
+	Created              int64  `json:"created,omitempty"`
+	Permission           string `json:"permission,omitempty"`
+	IsIfaAudience        bool   `json:"isIfaAudience,omitempty"`
+	RequestID            string `json:"requestId,omitempty"`
+	ClickURL             string `json:"clickUrl,omitempty"`
+	FailedType           string `json:"failedType,omitempty"`
+	Activated            int64  `json:"activated,omitempty"`
+	InactivatedTimestamp int64  `json:"inactivatedTimestamp,omitempty"`
+	ExpireTimestamp      int64  `json:"expireTimestamp,omitempty"`
+}
+
+// Job type
+type Job struct {
+	AudienceGroupJobID int    `json:"audienceGroupJobId,omitempty"`
+	AudienceGroupID    int    `json:"audienceGroupId,omitempty"`
+	Description        string `json:"description,omitempty"`
+	Type               string `json:"type,omitempty"`
+	Status             string `json:"status,omitempty"`
+	FailedType         string `json:"failedType,omitempty"`
+	AudienceCount      int64  `json:"audienceCount,omitempty"`
+	Created            int64  `json:"created,omitempty"`
+	JobStatus          string `json:"jobStatus,omitempty"`
+}
+
+// AdAccount type
+type AdAccount struct {
+	Name string `json:"name,omitempty"`
+}
+
+// GetAudienceGroupResponse type
+type GetAudienceGroupResponse struct {
+	RequestID         string        `json:"-"`
+	AcceptedRequestID string        `json:"-"`
+	AudienceGroup     AudienceGroup `json:"audienceGroup,omitempty"`
+	Jobs              []Job         `json:"jobs,omitempty"`
+	AdAccount         *AdAccount    `json:"adaccount,omitempty"`
+}
+
+// ListAudienceGroupResponse type
+type ListAudienceGroupResponse struct {
+	RequestID                        string          `json:"-"`
+	AcceptedRequestID                string          `json:"-"`
+	AudienceGroups                   []AudienceGroup `json:"audienceGroups,omitempty"`
+	HasNextPage                      bool            `json:"hasNextPage,omitempty"`
+	TotalCount                       int             `json:"totalCount,omitempty"`
+	ReadWriteAudienceGroupTotalCount int             `json:"readWriteAudienceGroupTotalCount,omitempty"`
+	Page                             int             `json:"page,omitempty"`
+	Size                             int             `json:"size,omitempty"`
+}
+
+// GetAudienceGroupAuthorityLevelResponse type
+type GetAudienceGroupAuthorityLevelResponse struct {
+	RequestID         string                     `json:"-"`
+	AcceptedRequestID string                     `json:"-"`
+	AuthorityLevel    AudienceAuthorityLevelType `json:"authorityLevel,omitempty"`
+}
+
 // isSuccess checks if status code is 2xx: The action was successfully received,
 // understood, and accepted.
 func isSuccess(code int) bool {
@@ -234,6 +392,21 @@ type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int64  `json:"expires_in"`
 	TokenType   string `json:"token_type"`
+	KeyID       string `json:"key_id"`
+}
+
+// AccessTokensResponse type
+type AccessTokensResponse struct {
+	KeyIDs []string `json:"kids"`
+}
+
+// TestWebhookResponse type
+type TestWebhookResponse struct {
+	Success    bool      `json:"success"`
+	Timestamp  time.Time `json:"timestamp"`
+	StatusCode int       `json:"statusCode"`
+	Reason     string    `json:"reason"`
+	Detail     string    `json:"detail"`
 }
 
 func checkResponse(res *http.Response) error {
@@ -282,12 +455,48 @@ func decodeToUserProfileResponse(res *http.Response) (*UserProfileResponse, erro
 	return &result, nil
 }
 
+func decodeToUserIDsResponse(res *http.Response) (*UserIDsResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := &UserIDsResponse{}
+	if err := decoder.Decode(result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func decodeToGroupSummaryResponse(res *http.Response) (*GroupSummaryResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := &GroupSummaryResponse{}
+	if err := decoder.Decode(result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func decodeToMemberIDsResponse(res *http.Response) (*MemberIDsResponse, error) {
 	if err := checkResponse(res); err != nil {
 		return nil, err
 	}
 	decoder := json.NewDecoder(res.Body)
 	result := &MemberIDsResponse{}
+	if err := decoder.Decode(result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func decodeToMemberCountResponse(res *http.Response) (*MemberCountResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := &MemberCountResponse{}
 	if err := decoder.Decode(result); err != nil {
 		return nil, err
 	}
@@ -334,6 +543,18 @@ func decodeToMessageConsumptionResponse(res *http.Response) (*MessageConsumption
 	return result, nil
 }
 
+func decodeToBotInfoResponse(res *http.Response) (*BotInfoResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := &BotInfoResponse{}
+	if err := decoder.Decode(result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func decodeToRichMenuResponse(res *http.Response) (*RichMenuResponse, error) {
 	if err := checkResponse(res); err != nil {
 		return nil, err
@@ -351,7 +572,7 @@ func decodeToRichMenuListResponse(res *http.Response) ([]*RichMenuResponse, erro
 		return nil, err
 	}
 	decoder := json.NewDecoder(res.Body)
-	var result = struct {
+	result := struct {
 		RichMenus []*RichMenuResponse `json:"richmenus"`
 	}{}
 	if err := decoder.Decode(&result); err != nil {
@@ -370,6 +591,32 @@ func decodeToRichMenuIDResponse(res *http.Response) (*RichMenuIDResponse, error)
 		return nil, err
 	}
 	return &result, nil
+}
+
+func decodeToRichMenuAliasResponse(res *http.Response) (*RichMenuAliasResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := RichMenuAliasResponse{}
+	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToRichMenuAliasListResponse(res *http.Response) ([]*RichMenuAliasResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := struct {
+		Aliases []*RichMenuAliasResponse `json:"aliases"`
+	}{}
+	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return result.Aliases, nil
 }
 
 func decodeToLIFFResponse(res *http.Response) (*LIFFAppsResponse, error) {
@@ -402,6 +649,18 @@ func decodeToLinkTokenResponse(res *http.Response) (*LinkTokenResponse, error) {
 	}
 	decoder := json.NewDecoder(res.Body)
 	result := LinkTokenResponse{}
+	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToWebhookInfoResponse(res *http.Response) (*WebhookInfoResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := WebhookInfoResponse{}
 	if err := decoder.Decode(&result); err != nil {
 		return nil, err
 	}
@@ -487,6 +746,138 @@ func decodeToAccessTokenResponse(res *http.Response) (*AccessTokenResponse, erro
 	decoder := json.NewDecoder(res.Body)
 	result := AccessTokenResponse{}
 	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToAccessTokensResponse(res *http.Response) (*AccessTokensResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := AccessTokensResponse{}
+	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToTestWebhookResponse(res *http.Response) (*TestWebhookResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := TestWebhookResponse{}
+	if err := decoder.Decode(&result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToAudienceGroupResponse(res *http.Response) (*UploadAudienceGroupResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := UploadAudienceGroupResponse{
+		RequestID:         res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToClickAudienceGroupResponse(res *http.Response) (*ClickAudienceGroupResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := ClickAudienceGroupResponse{
+		XRequestID:        res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToIMPAudienceGroupResponse(res *http.Response) (*IMPAudienceGroupResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := IMPAudienceGroupResponse{
+		XRequestID:        res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToGetAudienceGroupResponse(res *http.Response) (*GetAudienceGroupResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := GetAudienceGroupResponse{
+		RequestID:         res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToListAudienceGroupResponse(res *http.Response) (*ListAudienceGroupResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := ListAudienceGroupResponse{
+		RequestID:         res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+
+func decodeToGetAudienceGroupAuthorityLevelResponse(res *http.Response) (*GetAudienceGroupAuthorityLevelResponse, error) {
+	if err := checkResponse(res); err != nil {
+		return nil, err
+	}
+	decoder := json.NewDecoder(res.Body)
+	result := GetAudienceGroupAuthorityLevelResponse{
+		RequestID:         res.Header.Get("X-Line-Request-Id"),
+		AcceptedRequestID: res.Header.Get("X-Line-Accepted-Request-Id"),
+	}
+	if err := decoder.Decode(&result); err != nil {
+		if err == io.EOF {
+			return &result, nil
+		}
 		return nil, err
 	}
 	return &result, nil
