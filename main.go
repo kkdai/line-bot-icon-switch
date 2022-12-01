@@ -27,6 +27,7 @@ const (
 	BrownImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002734/iPhone/sticker_key@2x.png"
 	ConyImage  string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002735/iPhone/sticker_key@2x.png"
 	SallyImage string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/52002736/iPhone/sticker_key@2x.png"
+	BossImage  string = "https://stickershop.line-scdn.net/stickershop/v1/sticker/51626498/iPhone/sticker_key@2x.png"
 )
 
 var bot *linebot.Client
@@ -67,6 +68,8 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					sendr = linebot.NewSender("Cony", ConyImage)
 				case strings.EqualFold(message.Text, "Sally"):
 					sendr = linebot.NewSender("Sally", SallyImage)
+				case strings.EqualFold(message.Text, "Boss") || strings.Contains(message.Text, "老闆"):
+					sendr = linebot.NewSender("Boss", BossImage)
 				default:
 					//User input other than our provide range, notify user by quick reply.
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Please select following LINE Friends to reply you: Brown, Cony and Sally.")).Do(); err != nil {
